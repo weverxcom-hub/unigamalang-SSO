@@ -1,6 +1,8 @@
 import { prisma } from "@/lib/prisma";
 import Link from "next/link";
 
+export const dynamic = "force-dynamic";
+
 export default async function DashboardPage() {
   const [userCount, appCount, sessionCount] = await Promise.all([
     prisma.user.count({ where: { isActive: true } }),

@@ -1,6 +1,8 @@
 import { prisma } from "@/lib/prisma";
 import { RegisterAppForm } from "./register-app-form";
 
+export const dynamic = "force-dynamic";
+
 export default async function AppsPage() {
   const apps = await prisma.app.findMany({
     orderBy: { createdAt: "desc" },
