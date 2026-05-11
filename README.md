@@ -2,7 +2,7 @@
 
 Sistem autentikasi terpusat (SSO) untuk semua aplikasi internal
 Universitas Gajayana Malang. Login 1 kali, otomatis masuk ke semua
-aplikasi yang terhubung.
+aplikasi yang terhubung..
 
 ## Fitur
 
