@@ -1,36 +1,129 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# UNIGA SSO — Single Sign-On Gateway
 
-## Getting Started
+Sistem autentikasi terpusat (SSO) untuk semua aplikasi internal
+Universitas Gajayana Malang. Login 1 kali, otomatis masuk ke semua
+aplikasi yang terhubung.
 
-First, run the development server:
+## Fitur
 
-```bash
-npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
+- **Login terpusat** — satu halaman login untuk semua aplikasi
+- **Auto-login** — jika sudah login di SSO, aplikasi lain langsung
+  mendapat sesi tanpa input ulang
+- **Dashboard admin** — kelola pengguna dan aplikasi terdaftar
+- **Role per-app** — setiap pengguna bisa punya role berbeda di setiap
+  aplikasi (misal: ADMIN di Persuratan, HR di KGB)
+- **OAuth2 flow** — standard authorization code flow
+
+## Alur SSO
+
+```
+User → App (belum login)
+  → Redirect ke SSO /authorize?client_id=xxx&redirect_uri=xxx
+  → SSO /login (jika belum ada sesi SSO)
+  → User login → SSO buat sesi + auth code
+  → Redirect balik ke App /auth/callback?code=xxx
+  → App tukar code → dapat access_token + user info
+  → App buat sesi lokal → User sudah login
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+## Tech Stack
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+- Next.js 14 (App Router)
+- Prisma + PostgreSQL
+- `jose` (JWT)
+- `bcryptjs`
+- Tailwind CSS
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+## Menjalankan Secara Lokal
 
-## Learn More
+```bash
+# 1. Clone & install
+git clone https://github.com/weverxcom-hub/uniga-sso.git
+cd uniga-sso
+npm install
 
-To learn more about Next.js, take a look at the following resources:
+# 2. Konfigurasi
+cp .env.example .env
+# Sesuaikan DATABASE_URL dan SSO_JWT_SECRET
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+# 3. Migrasi + seed
+npx prisma migrate deploy
+npm run db:seed
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+# 4. Jalankan
+npm run dev
+# Buka http://localhost:3000
+```
 
-## Deploy on Vercel
+### Akun Demo
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
+| Email                              | Password   |
+|------------------------------------|------------|
+| admin@unigamalang.ac.id            | admin123   |
+| hr@unigamalang.ac.id               | hr12345    |
+| rektor@unigamalang.ac.id           | rektor123  |
+| dewi.anggraeni@unigamalang.ac.id   | pegawai123 |
 
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+### Dev Client Secrets
+
+| App          | Client ID      | Secret                    |
+|--------------|----------------|---------------------------|
+| Persuratan   | `persuratan`   | `persuratan-dev-secret`   |
+| Inventarisir | `inventarisir` | `inventarisir-dev-secret` |
+| KGB          | `kgb`          | `kgb-dev-secret`          |
+
+## API Endpoints
+
+### `GET /authorize`
+
+Authorization endpoint. Redirect user ke sini dari client app.
+
+Query params:
+- `client_id` — ID aplikasi terdaftar
+- `redirect_uri` — URL callback di client app
+- `state` — (opsional) random string untuk CSRF protection
+
+### `POST /api/token`
+
+Token exchange. Client app kirim auth code + credentials.
+
+Body (JSON):
+```json
+{
+  "code": "authorization_code_dari_redirect",
+  "client_id": "persuratan",
+  "client_secret": "client_secret_yang_didapat_saat_registrasi"
+}
+```
+
+Response:
+```json
+{
+  "access_token": "jwt_token",
+  "token_type": "Bearer",
+  "user": {
+    "id": "cuid",
+    "email": "admin@unigamalang.ac.id",
+    "name": "Administrator",
+    "role": "SUPER_ADMIN"
+  }
+}
+```
+
+### `GET /api/userinfo`
+
+Get user info from access token.
+
+Header: `Authorization: Bearer <access_token>`
+Query: `?client_id=persuratan` (opsional, untuk include role)
+
+## Menambahkan Aplikasi Baru
+
+1. Login ke SSO Dashboard → Aplikasi → Daftarkan Aplikasi Baru
+2. Simpan `client_secret` yang ditampilkan
+3. Di aplikasi baru, tambahkan:
+   - Route `/auth/callback` yang menerima `?code=xxx`
+   - Redirect ke SSO `/authorize` saat user belum login
+   - Tukar code di `/api/token` → dapat user info → buat sesi lokal
+
+Lihat `docs/sso-client-integration.md` untuk panduan lengkap.

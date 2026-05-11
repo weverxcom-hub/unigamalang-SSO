@@ -1,0 +1,75 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+/// Registered client application that can authenticate via SSO.
+model App {
+  id          String   @id @default(cuid())
+  clientId    String   @unique /// e.g. "persuratan", "inventarisir", "kgb"
+  name        String   /// Human-readable, e.g. "UNIGA Persuratan"
+  secret      String   /// bcrypt-hashed client secret for token exchange
+  redirectUri String   /// Allowed callback URL, e.g. https://persuratan.unigamalang.ac.id/auth/callback
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  appRoles  AppRole[]
+  authCodes AuthCode[]
+}
+
+/// Central user identity shared across all client applications.
+model User {
+  id           String    @id @default(cuid())
+  email        String    @unique
+  name         String
+  passwordHash String
+  isActive     Boolean   @default(true)
+  createdAt    DateTime  @default(now())
+  updatedAt    DateTime  @updatedAt
+
+  appRoles  AppRole[]
+  authCodes AuthCode[]
+  sessions  SSOSession[]
+}
+
+/// Per-app role mapping. A user can have different roles in each app.
+model AppRole {
+  id     String @id @default(cuid())
+  userId String
+  appId  String
+  role   String /// App-specific role string, e.g. "SUPER_ADMIN", "HR", "Admin"
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+  app  App  @relation(fields: [appId], references: [id], onDelete: Cascade)
+
+  @@unique([userId, appId])
+}
+
+/// Short-lived authorization code exchanged for a JWT token.
+model AuthCode {
+  id        String   @id @default(cuid())
+  code      String   @unique
+  userId    String
+  appId     String
+  expiresAt DateTime
+  used      Boolean  @default(false)
+  createdAt DateTime @default(now())
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+  app  App  @relation(fields: [appId], references: [id], onDelete: Cascade)
+}
+
+/// SSO session — tracks global login state so subsequent apps get auto-login.
+model SSOSession {
+  id        String   @id @default(cuid())
+  userId    String
+  token     String   @unique
+  expiresAt DateTime
+  createdAt DateTime @default(now())
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+}
