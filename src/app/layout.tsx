@@ -14,8 +14,9 @@ const geistMono = localFont({
 });
 
 export const metadata: Metadata = {
-  title: "UNIGA SSO — Single Sign-On",
-  description: "Sistem autentikasi terpusat Universitas Gajayana Malang",
+  title: "SSO — Universitas Gajayana Malang",
+  description: "Sistem Single Sign-On (SSO) terpusat Universitas Gajayana Malang. Login sekali, akses semua aplikasi.",
+  icons: { icon: "/logo-uniga.png" },
 };
 
 export default function RootLayout({

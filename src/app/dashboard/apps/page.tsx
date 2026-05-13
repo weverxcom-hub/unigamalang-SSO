@@ -20,33 +20,34 @@ export default async function AppsPage() {
 
       <RegisterAppForm />
 
-      <div className="rounded-xl border bg-white shadow-sm">
-        <div className="divide-y">
-          {apps.map((app) => (
-            <div key={app.id} className="px-5 py-4">
-              <div className="flex items-start justify-between">
-                <div>
-                  <h3 className="font-semibold text-gray-900">{app.name}</h3>
-                  <p className="mt-0.5 text-sm text-gray-500">
-                    Client ID: <code className="rounded bg-gray-100 px-1.5 py-0.5 text-xs font-mono">{app.clientId}</code>
-                  </p>
-                  <p className="mt-0.5 text-sm text-gray-500">
-                    Redirect: <code className="rounded bg-gray-100 px-1.5 py-0.5 text-xs font-mono">{app.redirectUri}</code>
-                  </p>
-                </div>
-                <span className="rounded-full bg-green-50 px-2.5 py-0.5 text-xs font-medium text-green-700">
-                  Aktif
-                </span>
+      <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3">
+        {apps.map((app) => (
+          <div key={app.id} className="rounded-xl border bg-white p-5 shadow-sm">
+            <div className="flex items-start justify-between">
+              <div className="flex h-10 w-10 items-center justify-center rounded-lg bg-blue-50 text-sm font-bold text-blue-600">
+                {app.name.charAt(0).toUpperCase()}
               </div>
+              <span className="rounded-full bg-green-50 px-2.5 py-0.5 text-xs font-medium text-green-700">
+                Aktif
+              </span>
             </div>
-          ))}
-          {apps.length === 0 && (
-            <p className="px-5 py-8 text-center text-sm text-gray-400">
-              Belum ada aplikasi terdaftar
-            </p>
-          )}
-        </div>
+            <h3 className="mt-3 font-semibold text-gray-900">{app.name}</h3>
+            <div className="mt-2 space-y-1">
+              <p className="text-sm text-gray-500">
+                Client ID: <code className="rounded bg-gray-100 px-1.5 py-0.5 text-xs font-mono">{app.clientId}</code>
+              </p>
+              <p className="truncate text-xs text-gray-400" title={app.redirectUri}>
+                {app.redirectUri}
+              </p>
+            </div>
+          </div>
+        ))}
       </div>
+      {apps.length === 0 && (
+        <div className="rounded-xl border bg-white p-8 text-center shadow-sm">
+          <p className="text-sm text-gray-400">Belum ada aplikasi terdaftar</p>
+        </div>
+      )}
     </div>
   );
 }

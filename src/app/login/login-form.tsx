@@ -9,7 +9,7 @@ function SubmitButton() {
     <button
       type="submit"
       disabled={pending}
-      className="w-full rounded-lg bg-blue-600 px-4 py-2.5 text-sm font-semibold text-white shadow-sm hover:bg-blue-700 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-blue-600 disabled:opacity-50 transition-colors"
+      className="w-full rounded-lg bg-blue-700 px-4 py-2.5 text-sm font-semibold text-white shadow-sm hover:bg-blue-800 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-blue-700 disabled:opacity-60 transition-colors"
     >
       {pending ? "Memproses..." : "Masuk"}
     </button>
@@ -41,7 +41,7 @@ export default function LoginForm({
       {state && <input type="hidden" name="state" value={state} />}
 
       {formState.error && (
-        <div className="rounded-md bg-red-50 p-3 text-sm text-red-700 border border-red-200">
+        <div className="rounded-lg bg-red-50 p-3 text-sm text-red-700 border border-red-200">
           {formState.error}
         </div>
       )}
@@ -49,9 +49,9 @@ export default function LoginForm({
       <div>
         <label
           htmlFor="email"
-          className="block text-sm font-medium text-gray-700 mb-1"
+          className="block text-sm font-medium text-gray-700 mb-1.5"
         >
-          Email
+          Email Institusi
         </label>
         <input
           id="email"
@@ -59,14 +59,14 @@ export default function LoginForm({
           type="email"
           required
           placeholder="nama@unigamalang.ac.id"
-          className="block w-full rounded-lg border border-gray-300 px-3 py-2 text-sm shadow-sm placeholder:text-gray-400 focus:border-blue-500 focus:ring-1 focus:ring-blue-500"
+          className="block w-full rounded-lg border border-gray-300 px-4 py-2.5 text-sm shadow-sm placeholder:text-gray-400 focus:border-blue-500 focus:outline-none focus:ring-2 focus:ring-blue-500/20"
         />
       </div>
 
       <div>
         <label
           htmlFor="password"
-          className="block text-sm font-medium text-gray-700 mb-1"
+          className="block text-sm font-medium text-gray-700 mb-1.5"
         >
           Kata Sandi
         </label>
@@ -76,7 +76,7 @@ export default function LoginForm({
           type="password"
           required
           placeholder="••••••••"
-          className="block w-full rounded-lg border border-gray-300 px-3 py-2 text-sm shadow-sm placeholder:text-gray-400 focus:border-blue-500 focus:ring-1 focus:ring-blue-500"
+          className="block w-full rounded-lg border border-gray-300 px-4 py-2.5 text-sm shadow-sm placeholder:text-gray-400 focus:border-blue-500 focus:outline-none focus:ring-2 focus:ring-blue-500/20"
         />
       </div>
 
