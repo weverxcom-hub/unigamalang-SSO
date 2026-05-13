@@ -77,6 +77,29 @@ export function SidebarNav() {
       </ul>
 
       <p className="mb-2 mt-6 px-2 text-xs font-semibold uppercase tracking-wider text-gray-400">
+        Tools
+      </p>
+      <ul className="space-y-1">
+        <li>
+          <Link
+            href="/dashboard/apps/setup"
+            className={`flex items-center gap-3 rounded-lg px-3 py-2.5 text-sm font-medium transition-colors ${
+              pathname === "/dashboard/apps/setup"
+                ? "bg-blue-50 text-blue-700"
+                : "text-gray-600 hover:bg-gray-50 hover:text-gray-900"
+            }`}
+          >
+            <span className={pathname === "/dashboard/apps/setup" ? "text-blue-600" : "text-gray-400"}>
+              <svg className="h-5 w-5" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor">
+                <path strokeLinecap="round" strokeLinejoin="round" d="M11.42 15.17l-5.385 3.073A1.5 1.5 0 014.5 16.95V7.05a1.5 1.5 0 011.535-1.293l5.385 3.073m0 6.34V8.83m0 6.34l5.385 3.073A1.5 1.5 0 0019.5 16.95V7.05a1.5 1.5 0 00-1.535-1.293L12.58 8.83m-1.16 6.34l1.16-6.34" />
+              </svg>
+            </span>
+            Auto-Setup Vercel
+          </Link>
+        </li>
+      </ul>
+
+      <p className="mb-2 mt-6 px-2 text-xs font-semibold uppercase tracking-wider text-gray-400">
         Dokumentasi
       </p>
       <ul className="space-y-1">

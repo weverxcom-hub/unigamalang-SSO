@@ -42,3 +42,65 @@ export async function registerAppAction(
     clientSecret: plainSecret,
   };
 }
+
+export interface EditAppState {
+  error?: string;
+  success?: string;
+}
+
+export async function editAppAction(
+  _prev: EditAppState,
+  formData: FormData
+): Promise<EditAppState> {
+  const appId = String(formData.get("app_id") ?? "");
+  const name = String(formData.get("name") ?? "").trim();
+  const redirectUri = String(formData.get("redirect_uri") ?? "").trim();
+
+  if (!appId || !name || !redirectUri) {
+    return { error: "Semua field wajib diisi." };
+  }
+
+  const app = await prisma.app.findUnique({ where: { id: appId } });
+  if (!app) return { error: "Aplikasi tidak ditemukan." };
+
+  await prisma.app.update({
+    where: { id: appId },
+    data: { name, redirectUri },
+  });
+
+  revalidatePath("/dashboard/apps");
+  return { success: `Aplikasi "${name}" berhasil diperbarui.` };
+}
+
+export async function deleteAppAction(formData: FormData) {
+  const appId = String(formData.get("app_id") ?? "");
+  if (!appId) return;
+
+  await prisma.app.delete({ where: { id: appId } });
+  revalidatePath("/dashboard/apps");
+}
+
+export async function regenerateSecretAction(
+  _prev: RegisterAppState,
+  formData: FormData
+): Promise<RegisterAppState> {
+  const appId = String(formData.get("app_id") ?? "");
+  if (!appId) return { error: "App ID diperlukan." };
+
+  const app = await prisma.app.findUnique({ where: { id: appId } });
+  if (!app) return { error: "Aplikasi tidak ditemukan." };
+
+  const plainSecret = generateSecret();
+  const hashedSecret = bcrypt.hashSync(plainSecret, 10);
+
+  await prisma.app.update({
+    where: { id: appId },
+    data: { secret: hashedSecret },
+  });
+
+  revalidatePath("/dashboard/apps");
+  return {
+    success: `Secret baru untuk "${app.name}". Simpan sekarang:`,
+    clientSecret: plainSecret,
+  };
+}
